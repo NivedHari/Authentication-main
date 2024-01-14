@@ -17,13 +17,9 @@ const AuthForm = () => {
 
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
-
+    setIsSending(true);
     if (isLogin) {
     } else {
-      setIsSending(true);
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      
       fetch(
         "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCGsfKHWAjmDu8yEHWUSWa8NmvoH1Vnv0s",
         {
@@ -37,23 +33,20 @@ const AuthForm = () => {
             "Content-Type": "application/json",
           },
         }
-        
       ).then((res) => {
+        setIsSending(false);
         if (res.ok) {
         } else {
           return res.json().then((data) => {
-            let errorMessage = 'Authentication Failed!';
-            if(data && data.error && data.error.message){
+            let errorMessage = "Authentication Failed!";
+            if (data && data.error && data.error.message) {
               errorMessage = data.error.message;
             }
             alert(errorMessage);
-            
           });
         }
       });
     }
-    setIsSending(false);
-    
   };
 
   return (
@@ -74,9 +67,7 @@ const AuthForm = () => {
           />
         </div>
         <div className={classes.actions}>
-          {!isSending && (
-            <button>{isLogin ? "Login" : "Create Account"}</button>
-          )}{" "}
+          {!isSending && <button>{isLogin ? "Login" : "Create Account"}</button>}
           {isSending && <p>Sending Request..</p>}
           <button
             type="button"
