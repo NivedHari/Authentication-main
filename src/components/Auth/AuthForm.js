@@ -18,22 +18,53 @@ const AuthForm = () => {
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
     setIsSending(true);
+    let url;
     if (isLogin) {
-    } else {
-      fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCGsfKHWAjmDu8yEHWUSWa8NmvoH1Vnv0s",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: enteredEmail,
-            password: enteredPassword,
-            returnSecureToken: true,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCGsfKHWAjmDu8yEHWUSWa8NmvoH1Vnv0s";
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+          email: enteredEmail,
+          password: enteredPassword,
+          returnSecureToken: true,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((res) => {
+        setIsSending(false);
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            let errorMessage = "Authentication Failed!";
+            if (data && data.error && data.error.message) {
+              errorMessage = data.error.message;
+            }
+            throw new Error(errorMessage);
+          });
         }
-      ).then((res) => {
+      }).then(data => {
+        console.log(data);
+      })
+      .catch(err =>{
+        alert(err.message)
+      });
+    } else {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCGsfKHWAjmDu8yEHWUSWa8NmvoH1Vnv0s";
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+          email: enteredEmail,
+          password: enteredPassword,
+          returnSecureToken: true,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((res) => {
         setIsSending(false);
         if (res.ok) {
         } else {
@@ -67,7 +98,9 @@ const AuthForm = () => {
           />
         </div>
         <div className={classes.actions}>
-          {!isSending && <button>{isLogin ? "Login" : "Create Account"}</button>}
+          {!isSending && (
+            <button>{isLogin ? "Login" : "Create Account"}</button>
+          )}
           {isSending && <p>Sending Request..</p>}
           <button
             type="button"
